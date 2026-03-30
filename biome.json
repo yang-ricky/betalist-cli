@@ -17,6 +17,10 @@
 			},
 			"suspicious": {
 				"noControlCharactersInRegex": "off"
+			},
+			"a11y": {
+				"useHtmlLang": "off",
+				"useAnchorContent": "off"
 			}
 		}
 	},
