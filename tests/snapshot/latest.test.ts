@@ -15,7 +15,7 @@ describe("Latest Command Snapshot", () => {
 				name: "Startup One",
 				url: "https://betalist.com/startups/startup-1",
 				tagline: "The first startup",
-				date: "Mar 29, 2026",
+				date: "2026-03-29",
 				categories: ["SaaS", "AI"],
 			},
 			{
@@ -23,7 +23,7 @@ describe("Latest Command Snapshot", () => {
 				name: "Startup Two",
 				url: "https://betalist.com/startups/startup-2",
 				tagline: "The second startup",
-				date: "Mar 28, 2026",
+				date: "2026-03-28",
 				categories: ["Fintech"],
 			},
 		];

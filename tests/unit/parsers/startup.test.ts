@@ -18,7 +18,7 @@ describe("parseStartupList", () => {
 		expect(startups[0].name).toBe("Test Startup 1");
 		expect(startups[0].url).toBe("https://betalist.com/startups/test-startup-1");
 		expect(startups[0].tagline).toBe("The first test startup for unit testing");
-		expect(startups[0].date).toBe("Mar 29, 2026");
+		expect(startups[0].date).toBe("2026-03-29");
 		expect(startups[0].categories).toEqual(["SaaS", "Productivity"]);
 		expect(startups[0].isBoosted).toBeUndefined();
 

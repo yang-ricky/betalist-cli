@@ -22,7 +22,7 @@ import {
 } from "../parsers/index.js";
 import type { Backend } from "./types.js";
 
-const SCHEMA_VERSION = "1";
+const SCHEMA_VERSION = "2";
 
 export class BetaListBackend implements Backend {
 	private lastRequestTime = 0;
@@ -51,8 +51,8 @@ export class BetaListBackend implements Backend {
 		// Check cache first
 		const cacheKey = this.makeCacheKey("list", `latest-page-${page}`);
 		const cached = this.cache.get<Startup[]>(cacheKey);
-		if (cached) {
-			return cached.data.slice(0, limit);
+		if (cached && cached.data.length > 0) {
+			return await this.enrichLatestStartups(cached.data.slice(0, limit));
 		}
 
 		// Try API if authenticated
@@ -61,8 +61,10 @@ export class BetaListBackend implements Backend {
 				const url = this.buildApiUrl("/startups", { page, per_page: limit });
 				const json = await this.fetchWithRetry(url, "json");
 				const startups = parseApiStartups(json);
-				this.cache.set(cacheKey, startups, DEFAULTS.cacheTTL.list);
-				return startups.slice(0, limit);
+				if (startups.length > 0) {
+					this.cache.set(cacheKey, startups, DEFAULTS.cacheTTL.list);
+				}
+				return await this.enrichLatestStartups(startups.slice(0, limit));
 			} catch {
 				// Fall through to HTML
 			}
@@ -71,14 +73,16 @@ export class BetaListBackend implements Backend {
 		// HTML fallback
 		const htmlCacheKey = this.makeCacheKey("list", `latest-page-${page}`, "html");
 		const htmlCached = this.cache.get<Startup[]>(htmlCacheKey);
-		if (htmlCached) {
-			return htmlCached.data.slice(0, limit);
+		if (htmlCached && htmlCached.data.length > 0) {
+			return await this.enrichLatestStartups(htmlCached.data.slice(0, limit));
 		}
 
 		const html = await this.fetchWithRetry(URLS.home, "text");
 		const startups = parseStartupList(html);
-		this.cache.set(htmlCacheKey, startups, DEFAULTS.cacheTTL.list);
-		return startups.slice(0, limit);
+		if (startups.length > 0) {
+			this.cache.set(htmlCacheKey, startups, DEFAULTS.cacheTTL.list);
+		}
+		return await this.enrichLatestStartups(startups.slice(0, limit));
 	}
 
 	async getStartup(slug: string): Promise<StartupDetail> {
@@ -110,7 +114,7 @@ export class BetaListBackend implements Backend {
 		// Check cache first
 		const cacheKey = this.makeCacheKey("markets", "all");
 		const cached = this.cache.get<Market[]>(cacheKey);
-		if (cached) {
+		if (cached && cached.data.length > 0) {
 			return cached.data;
 		}
 
@@ -120,7 +124,9 @@ export class BetaListBackend implements Backend {
 				const url = this.buildApiUrl("/markets");
 				const json = await this.fetchWithRetry(url, "json");
 				const markets = parseApiMarkets(json);
-				this.cache.set(cacheKey, markets, DEFAULTS.cacheTTL.markets);
+				if (markets.length > 0) {
+					this.cache.set(cacheKey, markets, DEFAULTS.cacheTTL.markets);
+				}
 				return markets;
 			} catch {
 				// Fall through to HTML
@@ -130,13 +136,15 @@ export class BetaListBackend implements Backend {
 		// HTML fallback
 		const htmlCacheKey = this.makeCacheKey("markets", "all", "html");
 		const htmlCached = this.cache.get<Market[]>(htmlCacheKey);
-		if (htmlCached) {
+		if (htmlCached && htmlCached.data.length > 0) {
 			return htmlCached.data;
 		}
 
 		const html = await this.fetchWithRetry(URLS.browse, "text");
 		const markets = parseMarketList(html);
-		this.cache.set(htmlCacheKey, markets, DEFAULTS.cacheTTL.markets);
+		if (markets.length > 0) {
+			this.cache.set(htmlCacheKey, markets, DEFAULTS.cacheTTL.markets);
+		}
 		return markets;
 	}
 
@@ -348,5 +356,37 @@ export class BetaListBackend implements Backend {
 
 	private sleep(ms: number): Promise<void> {
 		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
+
+	private async enrichLatestStartups(startups: Startup[]): Promise<Startup[]> {
+		const enriched = startups.map((startup) => ({ ...startup }));
+		const pending = enriched.filter((startup) => !startup.date || !startup.categories?.length);
+
+		if (pending.length === 0) {
+			return enriched;
+		}
+
+		const batchSize = 4;
+		for (let i = 0; i < pending.length; i += batchSize) {
+			const batch = pending.slice(i, i + batchSize);
+
+			await Promise.all(
+				batch.map(async (startup) => {
+					try {
+						const detail = await this.getStartup(startup.slug);
+						if (detail.date) startup.date = detail.date;
+						if (detail.categories?.length) startup.categories = detail.categories;
+					} catch {
+						// Leave partial homepage data in place when detail enrichment fails.
+					}
+				}),
+			);
+
+			if (i + batchSize < pending.length) {
+				await this.sleep(this.config.delay);
+			}
+		}
+
+		return enriched;
 	}
 }

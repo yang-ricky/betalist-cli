@@ -4,11 +4,9 @@ exports[`Latest Command Snapshot > should format startup list consistently 1`] =
 "┌────────────────────┬────────────────────────────────────────┬────────────┬────────────────────┐
 │ Name               │ Tagline                                │ Date       │ Categories         │
 ├────────────────────┼────────────────────────────────────────┼────────────┼────────────────────┤
-│ Startup One        │ The first startup                      │ Mar 29,    │ SaaS, AI           │
-│                    │                                        │ 2026       │                    │
+│ Startup One        │ The first startup                      │ 2026-03-29 │ SaaS, AI           │
 ├────────────────────┼────────────────────────────────────────┼────────────┼────────────────────┤
-│ Startup Two        │ The second startup                     │ Mar 28,    │ Fintech            │
-│                    │                                        │ 2026       │                    │
+│ Startup Two        │ The second startup                     │ 2026-03-28 │ Fintech            │
 └────────────────────┴────────────────────────────────────────┴────────────┴────────────────────┘"
 `;
 
