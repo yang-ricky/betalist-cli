@@ -1,194 +1,150 @@
-# betalist-cli
+<div align="center">
+  <h1>betalist-cli</h1>
+  <p><strong>Browse BetaList from your terminal.</strong></p>
+  <p>No login required by default · Public pages out of the box · Optional API token · JSON/YAML output</p>
+  <p>
+    <a href="./README.zh-CN.md">中文文档</a> ·
+    <a href="https://www.npmjs.com/package/betalist-cli">npm</a>
+  </p>
+  <p>
+    <img alt="npm version" src="https://img.shields.io/npm/v/betalist-cli">
+    <img alt="node version" src="https://img.shields.io/node/v/betalist-cli">
+    <img alt="license" src="https://img.shields.io/npm/l/betalist-cli">
+  </p>
+</div>
 
-[![npm version](https://img.shields.io/npm/v/betalist-cli.svg)](https://www.npmjs.com/package/betalist-cli)
-[![CI](https://github.com/yang-ricky/betalist-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/yang-ricky/betalist-cli/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+A CLI for public [BetaList](https://betalist.com) discovery workflows.
 
-**Unofficial CLI for BetaList — discover tomorrow's startups, today.**
+Read the latest startups, inspect a startup page by slug, list markets, and work with machine-readable JSON or YAML directly from your shell.
 
-> ⚠️ **Disclaimer**: This is an unofficial tool and is not affiliated with or endorsed by BetaList. Use responsibly and respect BetaList's terms of service.
+No login is required for the default HTML path. An API token is optional and used as an enhancement where available.
 
-## Installation
+Current `v0.1` scope: `latest`, `startup`, `markets`, `doctor`, and `config`.
+
+## Install
 
 ```bash
 npm install -g betalist-cli
 ```
 
-Requires Node.js >= 20.
+Requires **Node.js >= 20**.
+
+After installation:
+
+```bash
+bl --help
+betalist --help
+```
 
 ## Quick Start
 
 ```bash
-# Get latest startups
 bl latest
-
-# View startup details
+bl latest --limit 5 --json
 bl startup dusk-ai
-
-# Browse markets/categories
+bl startup dusk-ai --yaml
 bl markets
-
-# Health check
 bl doctor
+bl config show
 ```
 
 ## Commands
 
-### `bl latest`
+| Command | Description |
+|---|---|
+| `bl latest` | Show the latest startups with pagination support |
+| `bl startup <slug>` | Show details for a startup page |
+| `bl markets` | List BetaList markets / browse categories |
+| `bl doctor` | Check website reachability, selector health, optional API access, and cache |
+| `bl config show` | Show resolved config values |
+| `bl config set <key> <value>` | Update a string config value |
+| `bl config cache-clear` | Clear local cache |
 
-Get the latest startups from BetaList.
+## Output
 
-```bash
-bl latest                  # Get 20 latest startups
-bl latest --limit 10       # Limit to 10 results
-bl latest --page 2         # Get page 2
-bl latest --json           # Output as JSON
-```
+`latest`, `startup`, and `markets` follow these output rules:
 
-### `bl startup <slug>`
+| Scenario | Default |
+|---|---|
+| Interactive terminal | Human-readable table / text |
+| Pipe / redirect | JSON |
+| `--json` | JSON |
+| `--yaml` | YAML |
 
-Get details of a specific startup.
+The CLI respects `NO_COLOR` and `FORCE_COLOR`.
 
-```bash
-bl startup dusk-ai         # View startup details
-bl startup dusk-ai --json  # Output as JSON
-```
+Structured output includes metadata such as:
 
-### `bl markets`
+- `ok`
+- `schemaVersion`
+- `dataSource`
+- `providerChain`
+- `fetchedAt`
+- `cacheHit`
+- `degraded`
+- `warnings`
+- `error`
 
-List all markets/categories.
+## Startup Slugs
 
-```bash
-bl markets                 # List all markets
-bl markets --json          # Output as JSON
-```
-
-### `bl doctor`
-
-Check CLI health and diagnose issues.
-
-```bash
-bl doctor                  # Run health checks
-bl doctor --fix            # Attempt to fix local issues
-```
-
-### `bl config`
-
-Manage CLI configuration.
+`bl startup <slug>` currently accepts a BetaList slug only:
 
 ```bash
-bl config show             # Show current config
-bl config set api.token YOUR_TOKEN  # Set API token
-bl config cache-clear      # Clear local cache
+bl startup dusk-ai
 ```
 
-## Output Formats
+Example:
 
-| Environment | Default Output |
-|-------------|----------------|
-| TTY (terminal) | Colored table |
-| Non-TTY (pipe) | JSON |
-
-Override with flags:
-- `--json` — Force JSON output
-- `--yaml` — Force YAML output
-
-### JSON Output Schema
-
-```json
-{
-  "ok": true,
-  "schemaVersion": "1",
-  "dataSource": "html",
-  "providerChain": ["html"],
-  "fetchedAt": "2026-03-29T12:00:00.000Z",
-  "cacheHit": false,
-  "degraded": false,
-  "warnings": [],
-  "data": [...],
-  "error": null
-}
+```text
+https://betalist.com/startups/dusk-ai -> dusk-ai
 ```
+
+Full BetaList URLs are not accepted as command input yet.
 
 ## Configuration
 
-Configuration file: `~/.betalist-cli/config.yaml`
+Configuration is optional. The default setup works out of the box.
 
-```yaml
-api:
-  token: ""                    # Optional: BetaList API token
-  baseUrl: "http://api.betalist.com/v1"
-
-cache:
-  enabled: true
-  dir: ~/.betalist-cli/cache
-  ttl:
-    list: 300                  # 5 minutes
-    startup: 3600              # 1 hour
-    markets: 86400             # 24 hours
-
-request:
-  delay: 1000                  # Rate limit: 1 request/second
-  timeout: 10000
-  retries: 3
-```
-
-### Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `BL_API_TOKEN` | API token (overrides config file) |
-| `BL_CACHE_ENABLED` | Enable/disable cache |
-| `BL_REQUEST_DELAY` | Request delay in ms |
-| `NO_COLOR` | Disable colored output |
-| `FORCE_COLOR` | Force colored output |
-
-## API Token (Optional)
-
-This CLI works without an API token using HTML scraping. If you have a BetaList API token, you can configure it for enhanced stability:
+If you want to tweak behavior:
 
 ```bash
+bl config show
 bl config set api.token YOUR_TOKEN
+bl config set api.baseUrl http://api.betalist.com/v1
+bl config cache-clear
 ```
 
-API tokens can be requested from `api@betalist.com` (availability not guaranteed).
+The config file lives at:
+
+```bash
+~/.betalist-cli/config.yaml
+```
+
+You can also override settings with environment variables such as:
+
+- `BL_API_TOKEN=...`
+- `BL_API_BASE_URL=http://api.betalist.com/v1`
+- `BL_CACHE_ENABLED=false`
+- `BL_CACHE_DIR=/tmp/betalist-cli-cache`
+- `BL_REQUEST_DELAY=2500`
+- `BL_REQUEST_TIMEOUT=15000`
+
+`config set` currently writes string values. For booleans or numbers, prefer editing the YAML file directly or using environment variables.
 
 ## Data Sources
 
-| Priority | Source | Authentication |
-|----------|--------|----------------|
-| 1 | REST API | Token required |
-| 2 | HTML Scraping | None |
+- Default mode uses public BetaList HTML pages and does not require authentication.
+- When `api.token` or `BL_API_TOKEN` is configured, `latest` and `markets` try the BetaList API first and fall back to HTML.
+- `startup` details currently use HTML parsing even when a token is configured.
+- `doctor` checks the optional API only when a token is present.
 
-The CLI automatically falls back to HTML scraping if the API is unavailable.
+## Notes
 
-## Limitations
-
-- **Search**: Best-effort only, not guaranteed to match web search results
-- **Jobs**: Not included in v1 (focus is on startup discovery)
-- **Selectors**: HTML scraping may break if BetaList updates their site structure
-
-## Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | General error |
-| 2 | Authentication error |
-| 3 | Parse error (HTML structure changed) |
-| 4 | Rate limited |
-| 5 | Network error |
-| 6 | Configuration error |
-| 7 | Invalid arguments |
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
+- This is an unofficial project and is not affiliated with BetaList.
+- HTML-derived fields are best-effort and may change if BetaList updates its markup.
+- `doctor --fix` currently clears local cache as the first repair step.
+- Search, regions, and market/region-specific browsing are not exposed as CLI commands in `v0.1`.
 
 ## License
 
-MIT © [Ricky Yang](https://github.com/yang-ricky)
-
----
-
-**Not affiliated with BetaList. Use at your own risk.**
+[MIT](LICENSE)
