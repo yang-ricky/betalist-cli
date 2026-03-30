@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { getOutputFormat, isTTY, useColors } from "../../src/output.js";
 
 describe("getOutputFormat", () => {
@@ -15,13 +15,11 @@ describe("getOutputFormat", () => {
 	it("should prefer json when both --json and --yaml are specified", () => {
 		// Mock console.error to suppress warning
 		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		
+
 		const format = getOutputFormat({ json: true, yaml: true });
 		expect(format).toBe("json");
-		expect(errorSpy).toHaveBeenCalledWith(
-			expect.stringContaining("Both --json and --yaml")
-		);
-		
+		expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Both --json and --yaml"));
+
 		errorSpy.mockRestore();
 	});
 

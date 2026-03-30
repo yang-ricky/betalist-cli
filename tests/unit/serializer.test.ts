@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { toJSON, toYAML, serialize } from "../../src/serializer.js";
+import { describe, expect, it } from "vitest";
 import type { CLIOutput } from "../../src/models/index.js";
+import { serialize, toJSON, toYAML } from "../../src/serializer.js";
 
 describe("toJSON", () => {
 	it("should serialize CLIOutput to JSON", () => {

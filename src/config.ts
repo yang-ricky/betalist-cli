@@ -1,9 +1,8 @@
 import * as fs from "node:fs";
-import * as path from "node:path";
 import * as os from "node:os";
-import { cosmiconfig } from "cosmiconfig";
+import * as path from "node:path";
 import yaml from "js-yaml";
-import { DEFAULTS, API_BASE_URL } from "./constants.js";
+import { API_BASE_URL, DEFAULTS } from "./constants.js";
 import { ConfigError } from "./errors.js";
 
 export interface Config {
@@ -73,7 +72,7 @@ function loadConfigFile(): Partial<Config> {
 	try {
 		const content = fs.readFileSync(configPath, "utf-8");
 		return (yaml.load(content) as Partial<Config>) || {};
-	} catch (error) {
+	} catch (_error) {
 		throw new ConfigError(`Failed to parse config file: ${configPath}`);
 	}
 }
@@ -115,10 +114,7 @@ function loadEnvConfig(): Partial<Config> {
 	return env;
 }
 
-function deepMerge(
-	target: Config,
-	...sources: Partial<Config>[]
-): Config {
+function deepMerge(target: Config, ...sources: Partial<Config>[]): Config {
 	const result = JSON.parse(JSON.stringify(target)) as Config;
 
 	for (const source of sources) {
@@ -183,8 +179,7 @@ export function getConfigDisplay(config: Config): Record<string, unknown> {
 	const display = JSON.parse(JSON.stringify(config));
 	if (display.api?.token) {
 		const token = display.api.token;
-		display.api.token =
-			token.length > 8 ? `${token.slice(0, 8)}****` : "****";
+		display.api.token = token.length > 8 ? `${token.slice(0, 8)}****` : "****";
 	}
 	return display;
 }

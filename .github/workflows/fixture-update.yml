@@ -1,0 +1,63 @@
+name: Update Fixtures
+
+on:
+  schedule:
+    - cron: '0 10 * * 0'  # Weekly on Sunday at 10:00 UTC
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  update-fixtures:
+    name: Update HTML Fixtures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      - name: Update fixtures
+        run: npm run fixtures:update
+
+      - name: Check for significant changes
+        id: diff-check
+        run: |
+          git diff --stat tests/fixtures/html/ > diff-output.txt
+          
+          # Count lines changed
+          LINES_CHANGED=$(git diff --numstat tests/fixtures/html/ | awk '{sum += $1 + $2} END {print sum}')
+          echo "lines_changed=${LINES_CHANGED:-0}" >> $GITHUB_OUTPUT
+          
+          # Threshold: more than 100 lines changed is significant
+          if [ "${LINES_CHANGED:-0}" -gt 100 ]; then
+            echo "significant=true" >> $GITHUB_OUTPUT
+          else
+            echo "significant=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue for significant changes
+        if: steps.diff-check.outputs.significant == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const diff = fs.readFileSync('diff-output.txt', 'utf8');
+            const linesChanged = '${{ steps.diff-check.outputs.lines_changed }}';
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '📄 Significant HTML structure changes detected',
+              body: `## HTML Fixture Update\n\nThe weekly fixture update has detected significant changes (${linesChanged} lines).\n\n### Changes\n\`\`\`\n${diff}\n\`\`\`\n\n### Action Required\n1. Review the changes\n2. Update selectors if needed\n3. Run tests to verify`,
+              labels: ['fixture-update', 'automated']
+            });
+
+      - name: Commit minor changes
+        if: steps.diff-check.outputs.significant == 'false' && steps.diff-check.outputs.lines_changed != '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tests/fixtures/html/
+          git commit -m "chore: update HTML fixtures [skip ci]" || true
+          git push || true

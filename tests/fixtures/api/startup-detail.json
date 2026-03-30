@@ -1,11 +1,11 @@
 {
-  "id": 12345,
-  "name": "API Startup 1",
-  "slug": "api-startup-1",
-  "tagline": "First startup from API",
-  "description": "This is the full description from the API. It contains detailed information about the startup.",
-  "site_url": "https://apistartup1.com",
-  "logo_url": "https://example.com/api-logo1.png",
-  "created_at": "2026-03-29",
-  "maker": "Jane Smith"
+	"id": 12345,
+	"name": "API Startup 1",
+	"slug": "api-startup-1",
+	"tagline": "First startup from API",
+	"description": "This is the full description from the API. It contains detailed information about the startup.",
+	"site_url": "https://apistartup1.com",
+	"logo_url": "https://example.com/api-logo1.png",
+	"created_at": "2026-03-29",
+	"maker": "Jane Smith"
 }

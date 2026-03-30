@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import type { Market } from "../../src/models/index.js";
+import { describe, expect, it } from "vitest";
 import { formatMarketsTable } from "../../src/formatter.js";
+import type { Market } from "../../src/models/index.js";
 
 // Strip ANSI codes
 function stripAnsi(str: string): string {
@@ -25,9 +25,7 @@ describe("Markets Command Snapshot", () => {
 	});
 
 	it("should handle minimal data", () => {
-		const mockMarkets: Market[] = [
-			{ slug: "minimal", name: "Minimal Category" },
-		];
+		const mockMarkets: Market[] = [{ slug: "minimal", name: "Minimal Category" }];
 
 		const output = stripAnsi(formatMarketsTable(mockMarkets));
 		expect(output).toMatchSnapshot();

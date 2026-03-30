@@ -1,0 +1,59 @@
+name: API Health Check
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # Daily at 9:00 UTC
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  check-api:
+    name: Check API
+    runs-on: ubuntu-latest
+    if: ${{ secrets.BL_API_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      - name: Run API health check
+        id: api-check
+        continue-on-error: true
+        env:
+          BL_API_TOKEN: ${{ secrets.BL_API_TOKEN }}
+        run: |
+          node dist/index.js doctor --json 2>&1 | tee api-output.txt
+          # Check if API section shows errors
+          if grep -q '"status": "error"' api-output.txt; then
+            echo "api_healthy=false" >> $GITHUB_OUTPUT
+          else
+            echo "api_healthy=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue if API unhealthy
+        if: steps.api-check.outputs.api_healthy == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('api-output.txt', 'utf8');
+            
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'api-issue'
+            });
+            
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🔌 API health check failed',
+                body: `## API Health Check Failed\n\nThe daily API health check has detected issues.\n\n### Output\n\`\`\`\n${output}\n\`\`\`\n\n### Possible Causes\n- API token expired\n- API endpoint changed\n- API service down`,
+                labels: ['api-issue', 'automated']
+              });
+            }

@@ -1,9 +1,8 @@
-import { Command } from "commander";
 import chalk from "chalk";
-import { loadConfig, clearCache } from "../config.js";
-import { AnonymousAuth, TokenAuth } from "../auth/index.js";
+import { Command } from "commander";
 import { FileCache } from "../cache/index.js";
-import { SITE_URL, API_BASE_URL } from "../constants.js";
+import { clearCache, loadConfig } from "../config.js";
+import { SITE_URL } from "../constants.js";
 import { parseStartupList } from "../parsers/index.js";
 
 interface CheckResult {
@@ -71,20 +70,14 @@ export const doctorCommand = new Command("doctor")
 			console.log(chalk.green("✓ All checks passed!"));
 		} else {
 			if (errors.length > 0) {
-				console.log(
-					chalk.red(`${errors.length} error(s) found.`),
-				);
+				console.log(chalk.red(`${errors.length} error(s) found.`));
 			}
 			if (warnings.length > 0) {
-				console.log(
-					chalk.yellow(`${warnings.length} warning(s) found.`),
-				);
+				console.log(chalk.yellow(`${warnings.length} warning(s) found.`));
 			}
 
 			// Show suggestions
-			const suggestions = results
-				.filter((r) => r.suggestion)
-				.map((r) => r.suggestion);
+			const suggestions = results.filter((r) => r.suggestion).map((r) => r.suggestion);
 			if (suggestions.length > 0) {
 				console.log();
 				console.log(chalk.bold("Suggestions:"));
@@ -132,7 +125,7 @@ async function checkWebsite(): Promise<CheckResult> {
 			message: `${SITE_URL} — HTTP ${response.status}`,
 			suggestion: "Check your network connection",
 		};
-	} catch (error) {
+	} catch (_error) {
 		return {
 			name: "Website reachable",
 			status: "error",
@@ -176,7 +169,7 @@ async function checkSelectors(): Promise<CheckResult[]> {
 				suggestion: "Run `npm outdated betalist-cli` to check for updates",
 			});
 		}
-	} catch (error) {
+	} catch (_error) {
 		results.push({
 			name: "Startup list page",
 			status: "error",
@@ -188,10 +181,7 @@ async function checkSelectors(): Promise<CheckResult[]> {
 	return results;
 }
 
-async function checkApi(
-	token: string,
-	baseUrl: string,
-): Promise<CheckResult[]> {
+async function checkApi(token: string, baseUrl: string): Promise<CheckResult[]> {
 	const results: CheckResult[] = [];
 
 	// Check API reachability

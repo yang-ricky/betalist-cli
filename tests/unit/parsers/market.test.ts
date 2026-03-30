@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { describe, expect, it } from "vitest";
 import { parseMarketList } from "../../../src/parsers/market.js";
 
 const fixturesDir = join(__dirname, "../../fixtures");

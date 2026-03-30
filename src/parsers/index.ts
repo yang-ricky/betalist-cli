@@ -1,8 +1,8 @@
-export { parseStartupList, parseStartupDetail } from "./startup.js";
-export { parseMarketList } from "./market.js";
 export {
-	parseApiStartups,
-	parseApiStartupDetail,
 	parseApiMarkets,
 	parseApiRegions,
+	parseApiStartupDetail,
+	parseApiStartups,
 } from "./api.js";
+export { parseMarketList } from "./market.js";
+export { parseStartupDetail, parseStartupList } from "./startup.js";

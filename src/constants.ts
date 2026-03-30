@@ -7,12 +7,10 @@ export const URLS = {
 	startup: (slug: string) => `${SITE_URL}/startups/${slug}`,
 	browse: `${SITE_URL}/browse`,
 	browseCategory: (cat: string) => `${SITE_URL}/browse/${cat}`,
-	browseTopic: (cat: string, topic: string) =>
-		`${SITE_URL}/browse/${cat}/${topic}`,
+	browseTopic: (cat: string, topic: string) => `${SITE_URL}/browse/${cat}/${topic}`,
 	regions: `${SITE_URL}/regions`,
 	region: (slug: string) => `${SITE_URL}/regions/${slug}`,
-	search: (q: string) =>
-		`${SITE_URL}/search?q=${encodeURIComponent(q)}`,
+	search: (q: string) => `${SITE_URL}/search?q=${encodeURIComponent(q)}`,
 } as const;
 
 export const DEFAULTS = {

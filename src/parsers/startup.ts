@@ -1,8 +1,8 @@
 import * as cheerio from "cheerio";
-import { STARTUP_SELECTORS } from "../selectors.js";
 import { SITE_URL } from "../constants.js";
 import { ParseError } from "../errors.js";
 import type { Startup, StartupDetail } from "../models/index.js";
+import { STARTUP_SELECTORS } from "../selectors.js";
 
 /**
  * Parse startup list from homepage HTML
@@ -74,9 +74,7 @@ export function parseStartupDetail(html: string, slug: string): StartupDetail {
 	// required: description
 	const description = $(STARTUP_SELECTORS.description).text().trim();
 	if (!description) {
-		throw new ParseError(
-			`Failed to parse startup description for slug: ${slug}`,
-		);
+		throw new ParseError(`Failed to parse startup description for slug: ${slug}`);
 	}
 
 	const startup: StartupDetail = {

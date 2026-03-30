@@ -1,16 +1,12 @@
 import { Command } from "commander";
-import { loadConfig } from "../config.js";
 import { AnonymousAuth, TokenAuth } from "../auth/index.js";
-import { FileCache } from "../cache/index.js";
 import { BetaListBackend } from "../backends/index.js";
-import {
-	getOutputFormat,
-	createOutput,
-	createErrorOutput,
-} from "../output.js";
-import { formatStartupDetail } from "../formatter.js";
-import { serialize } from "../serializer.js";
+import { FileCache } from "../cache/index.js";
+import { loadConfig } from "../config.js";
 import { ExitCode, ParseError } from "../errors.js";
+import { formatStartupDetail } from "../formatter.js";
+import { createErrorOutput, createOutput, getOutputFormat } from "../output.js";
+import { serialize } from "../serializer.js";
 
 export const startupCommand = new Command("startup")
 	.description("Get details of a specific startup")
@@ -21,9 +17,7 @@ export const startupCommand = new Command("startup")
 	.action(async (slug: string, options) => {
 		try {
 			const config = loadConfig();
-			const auth = config.api.token
-				? new TokenAuth(config.api.token)
-				: new AnonymousAuth();
+			const auth = config.api.token ? new TokenAuth(config.api.token) : new AnonymousAuth();
 			const cache = new FileCache(config.cache.dir);
 			const backend = new BetaListBackend(auth, cache, {
 				delay: config.request.delay,
@@ -45,13 +39,9 @@ export const startupCommand = new Command("startup")
 				console.log(serialize(output, format));
 			}
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Unknown error";
+			const message = error instanceof Error ? error.message : "Unknown error";
 			const format = getOutputFormat(options);
-			const exitCode =
-				error instanceof ParseError
-					? ExitCode.ParseError
-					: ExitCode.NetworkError;
+			const exitCode = error instanceof ParseError ? ExitCode.ParseError : ExitCode.NetworkError;
 
 			if (format !== "table") {
 				const output = createErrorOutput(

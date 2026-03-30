@@ -35,9 +35,7 @@ export function getOutputFormat(options: OutputOptions): OutputFormat {
 	// --json takes priority
 	if (options.json) {
 		if (options.yaml) {
-			console.error(
-				"Warning: Both --json and --yaml specified, using --json",
-			);
+			console.error("Warning: Both --json and --yaml specified, using --json");
 		}
 		return "json";
 	}

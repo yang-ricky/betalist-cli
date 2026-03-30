@@ -1,22 +1,22 @@
 [
-  {
-    "slug": "saas",
-    "name": "SaaS",
-    "startupCount": 1234
-  },
-  {
-    "slug": "ai",
-    "name": "AI",
-    "startupCount": 567
-  },
-  {
-    "slug": "fintech",
-    "name": "Fintech",
-    "startupCount": 890,
-    "parentSlug": "finance"
-  },
-  {
-    "slug": "minimal",
-    "name": "Minimal Category"
-  }
+	{
+		"slug": "saas",
+		"name": "SaaS",
+		"startupCount": 1234
+	},
+	{
+		"slug": "ai",
+		"name": "AI",
+		"startupCount": 567
+	},
+	{
+		"slug": "fintech",
+		"name": "Fintech",
+		"startupCount": 890,
+		"parentSlug": "finance"
+	},
+	{
+		"slug": "minimal",
+		"name": "Minimal Category"
+	}
 ]

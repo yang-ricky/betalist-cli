@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseStartupList, parseStartupDetail } from "../../../src/parsers/startup.js";
+import { describe, expect, it } from "vitest";
 import { ParseError } from "../../../src/errors.js";
+import { parseStartupDetail, parseStartupList } from "../../../src/parsers/startup.js";
 
 const fixturesDir = join(__dirname, "../../fixtures");
 

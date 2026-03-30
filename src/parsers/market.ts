@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
-import { MARKET_SELECTORS } from "../selectors.js";
 import type { Market } from "../models/index.js";
+import { MARKET_SELECTORS } from "../selectors.js";
 
 /**
  * Parse market list from browse page HTML

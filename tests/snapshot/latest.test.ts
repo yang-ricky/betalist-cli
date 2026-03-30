@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import type { Startup } from "../../src/models/index.js";
+import { describe, expect, it } from "vitest";
 import { formatStartupListTable } from "../../src/formatter.js";
+import type { Startup } from "../../src/models/index.js";
 
 // Strip ANSI codes
 function stripAnsi(str: string): string {

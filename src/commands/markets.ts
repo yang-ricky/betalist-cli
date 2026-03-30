@@ -1,16 +1,12 @@
 import { Command } from "commander";
-import { loadConfig } from "../config.js";
 import { AnonymousAuth, TokenAuth } from "../auth/index.js";
-import { FileCache } from "../cache/index.js";
 import { BetaListBackend } from "../backends/index.js";
-import {
-	getOutputFormat,
-	createOutput,
-	createErrorOutput,
-} from "../output.js";
-import { formatMarketsTable } from "../formatter.js";
-import { serialize } from "../serializer.js";
+import { FileCache } from "../cache/index.js";
+import { loadConfig } from "../config.js";
 import { ExitCode } from "../errors.js";
+import { formatMarketsTable } from "../formatter.js";
+import { createErrorOutput, createOutput, getOutputFormat } from "../output.js";
+import { serialize } from "../serializer.js";
 
 export const marketsCommand = new Command("markets")
 	.description("List all markets/categories")
@@ -20,9 +16,7 @@ export const marketsCommand = new Command("markets")
 	.action(async (options) => {
 		try {
 			const config = loadConfig();
-			const auth = config.api.token
-				? new TokenAuth(config.api.token)
-				: new AnonymousAuth();
+			const auth = config.api.token ? new TokenAuth(config.api.token) : new AnonymousAuth();
 			const cache = new FileCache(config.cache.dir);
 			const backend = new BetaListBackend(auth, cache, {
 				delay: config.request.delay,
@@ -44,16 +38,11 @@ export const marketsCommand = new Command("markets")
 				console.log(serialize(output, format));
 			}
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Unknown error";
+			const message = error instanceof Error ? error.message : "Unknown error";
 			const format = getOutputFormat(options);
 
 			if (format !== "table") {
-				const output = createErrorOutput(
-					"fetch_failed",
-					message,
-					ExitCode.NetworkError,
-				);
+				const output = createErrorOutput("fetch_failed", message, ExitCode.NetworkError);
 				console.log(serialize(output, format));
 			} else {
 				console.error(`Error: ${message}`);

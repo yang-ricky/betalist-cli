@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import type { StartupDetail } from "../../src/models/index.js";
+import { describe, expect, it } from "vitest";
 import { formatStartupDetail } from "../../src/formatter.js";
+import type { StartupDetail } from "../../src/models/index.js";
 
 // Strip ANSI codes
 function stripAnsi(str: string): string {
@@ -13,7 +13,8 @@ describe("Startup Command Snapshot", () => {
 			slug: "test-startup",
 			name: "Test Startup",
 			url: "https://betalist.com/startups/test-startup",
-			description: "This is a comprehensive description of the startup. It provides amazing features.",
+			description:
+				"This is a comprehensive description of the startup. It provides amazing features.",
 			tagline: "Build something amazing",
 			siteUrl: "https://teststartup.com",
 			maker: "John Doe",

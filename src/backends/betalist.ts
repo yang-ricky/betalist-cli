@@ -1,27 +1,26 @@
 import type { AuthProvider } from "../auth/types.js";
 import type { Cache } from "../cache/types.js";
+import { API_BASE_URL, DEFAULTS, URLS } from "../constants.js";
+import { NetworkError, RateLimitError } from "../errors.js";
 import type {
-	Startup,
-	StartupDetail,
+	CacheKey,
+	ListOptions,
 	Market,
 	Region,
-	ListOptions,
 	SearchOptions,
 	SearchResult,
-	CacheKey,
+	Startup,
+	StartupDetail,
 } from "../models/index.js";
-import type { Backend } from "./types.js";
-import { SITE_URL, API_BASE_URL, URLS, DEFAULTS } from "../constants.js";
-import { NetworkError, RateLimitError, ParseError } from "../errors.js";
 import {
-	parseStartupList,
-	parseStartupDetail,
-	parseMarketList,
-	parseApiStartups,
-	parseApiStartupDetail,
 	parseApiMarkets,
 	parseApiRegions,
+	parseApiStartups,
+	parseMarketList,
+	parseStartupDetail,
+	parseStartupList,
 } from "../parsers/index.js";
+import type { Backend } from "./types.js";
 
 const SCHEMA_VERSION = "1";
 
@@ -141,10 +140,7 @@ export class BetaListBackend implements Backend {
 		return markets;
 	}
 
-	async getStartupsByMarket(
-		categorySlug: string,
-		options?: ListOptions,
-	): Promise<Startup[]> {
+	async getStartupsByMarket(categorySlug: string, options?: ListOptions): Promise<Startup[]> {
 		const limit = options?.limit ?? DEFAULTS.limit;
 
 		// HTML only for Phase 1
@@ -187,10 +183,7 @@ export class BetaListBackend implements Backend {
 		return [];
 	}
 
-	async getStartupsByRegion(
-		regionSlug: string,
-		options?: ListOptions,
-	): Promise<Startup[]> {
+	async getStartupsByRegion(regionSlug: string, options?: ListOptions): Promise<Startup[]> {
 		const limit = options?.limit ?? DEFAULTS.limit;
 
 		// HTML only for Phase 1
@@ -252,10 +245,7 @@ export class BetaListBackend implements Backend {
 		};
 	}
 
-	private buildApiUrl(
-		path: string,
-		params?: Record<string, string | number>,
-	): string {
+	private buildApiUrl(path: string, params?: Record<string, string | number>): string {
 		const url = new URL(path, API_BASE_URL);
 		const queryParams = { ...this.auth.getQueryParams(), ...params };
 		for (const [key, value] of Object.entries(queryParams)) {
@@ -293,14 +283,8 @@ export class BetaListBackend implements Backend {
 		}
 	}
 
-	private async fetchWithRetry(
-		url: string,
-		responseType: "text",
-	): Promise<string>;
-	private async fetchWithRetry(
-		url: string,
-		responseType: "json",
-	): Promise<unknown>;
+	private async fetchWithRetry(url: string, responseType: "text"): Promise<string>;
+	private async fetchWithRetry(url: string, responseType: "json"): Promise<unknown>;
 	private async fetchWithRetry(
 		url: string,
 		responseType: "text" | "json",
@@ -312,10 +296,7 @@ export class BetaListBackend implements Backend {
 		for (let attempt = 0; attempt < this.config.retries; attempt++) {
 			try {
 				const controller = new AbortController();
-				const timeoutId = setTimeout(
-					() => controller.abort(),
-					this.config.timeout,
-				);
+				const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
 
 				const response = await fetch(url, {
 					headers: this.auth.getHeaders(),
@@ -326,15 +307,13 @@ export class BetaListBackend implements Backend {
 
 				if (response.status === 429 || response.status === 503) {
 					// Exponential backoff
-					const delay = Math.pow(2, attempt) * 1000;
+					const delay = 2 ** attempt * 1000;
 					await this.sleep(delay);
 					continue;
 				}
 
 				if (!response.ok) {
-					throw new NetworkError(
-						`HTTP ${response.status}: ${response.statusText}`,
-					);
+					throw new NetworkError(`HTTP ${response.status}: ${response.statusText}`);
 				}
 
 				if (responseType === "json") {
@@ -347,7 +326,7 @@ export class BetaListBackend implements Backend {
 					throw error;
 				}
 				// Retry on network errors
-				const delay = Math.pow(2, attempt) * 1000;
+				const delay = 2 ** attempt * 1000;
 				await this.sleep(delay);
 			}
 		}

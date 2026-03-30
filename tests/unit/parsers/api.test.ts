@@ -1,20 +1,18 @@
-import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { describe, expect, it } from "vitest";
 import {
-	parseApiStartups,
-	parseApiStartupDetail,
 	parseApiMarkets,
 	parseApiRegions,
+	parseApiStartupDetail,
+	parseApiStartups,
 } from "../../../src/parsers/api.js";
 
 const fixturesDir = join(__dirname, "../../fixtures");
 
 describe("parseApiStartups", () => {
 	it("should parse startups from API response", () => {
-		const json = JSON.parse(
-			readFileSync(join(fixturesDir, "api/startups.json"), "utf-8")
-		);
+		const json = JSON.parse(readFileSync(join(fixturesDir, "api/startups.json"), "utf-8"));
 		const startups = parseApiStartups(json);
 
 		expect(startups).toHaveLength(3);
@@ -40,9 +38,7 @@ describe("parseApiStartups", () => {
 
 describe("parseApiStartupDetail", () => {
 	it("should parse startup detail from API response", () => {
-		const json = JSON.parse(
-			readFileSync(join(fixturesDir, "api/startup-detail.json"), "utf-8")
-		);
+		const json = JSON.parse(readFileSync(join(fixturesDir, "api/startup-detail.json"), "utf-8"));
 		const startup = parseApiStartupDetail(json);
 
 		expect(startup).not.toBeNull();
@@ -62,9 +58,7 @@ describe("parseApiStartupDetail", () => {
 
 describe("parseApiMarkets", () => {
 	it("should parse markets from API response", () => {
-		const json = JSON.parse(
-			readFileSync(join(fixturesDir, "api/markets.json"), "utf-8")
-		);
+		const json = JSON.parse(readFileSync(join(fixturesDir, "api/markets.json"), "utf-8"));
 		const markets = parseApiMarkets(json);
 
 		expect(markets).toHaveLength(3);
@@ -84,9 +78,7 @@ describe("parseApiMarkets", () => {
 
 describe("parseApiRegions", () => {
 	it("should parse regions from API response", () => {
-		const json = JSON.parse(
-			readFileSync(join(fixturesDir, "api/regions.json"), "utf-8")
-		);
+		const json = JSON.parse(readFileSync(join(fixturesDir, "api/regions.json"), "utf-8"));
 		const regions = parseApiRegions(json);
 
 		expect(regions).toHaveLength(3);

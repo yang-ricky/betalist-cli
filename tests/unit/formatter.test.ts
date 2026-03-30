@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-	formatStartupListTable,
-	formatStartupDetail,
 	formatMarketsTable,
+	formatStartupDetail,
+	formatStartupListTable,
 } from "../../src/formatter.js";
-import type { Startup, StartupDetail, Market } from "../../src/models/index.js";
+import type { Market, Startup, StartupDetail } from "../../src/models/index.js";
 
 // Strip ANSI codes for testing
 function stripAnsi(str: string): string {

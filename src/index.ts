@@ -1,11 +1,11 @@
-import { program } from "commander";
 import { createRequire } from "node:module";
+import { program } from "commander";
 import {
-	latestCommand,
-	startupCommand,
-	marketsCommand,
-	doctorCommand,
 	configCommand,
+	doctorCommand,
+	latestCommand,
+	marketsCommand,
+	startupCommand,
 } from "./commands/index.js";
 
 const require = createRequire(import.meta.url);

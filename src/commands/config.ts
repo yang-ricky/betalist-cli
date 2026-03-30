@@ -1,13 +1,7 @@
 import { Command } from "commander";
-import {
-	loadConfig,
-	setConfigValue,
-	getConfigDisplay,
-	clearCache,
-} from "../config.js";
+import { clearCache, getConfigDisplay, loadConfig, setConfigValue } from "../config.js";
 
-export const configCommand = new Command("config")
-	.description("Manage CLI configuration");
+export const configCommand = new Command("config").description("Manage CLI configuration");
 
 configCommand
 	.command("show")
@@ -28,8 +22,7 @@ configCommand
 			setConfigValue(key, value);
 			console.log(`Set ${key} = ${key.includes("token") ? "****" : value}`);
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Unknown error";
+			const message = error instanceof Error ? error.message : "Unknown error";
 			console.error(`Error: ${message}`);
 			process.exit(1);
 		}
@@ -44,8 +37,7 @@ configCommand
 			clearCache(config);
 			console.log("Cache cleared successfully");
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Unknown error";
+			const message = error instanceof Error ? error.message : "Unknown error";
 			console.error(`Error: ${message}`);
 			process.exit(1);
 		}

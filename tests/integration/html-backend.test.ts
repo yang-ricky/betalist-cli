@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { AnonymousAuth } from "../../src/auth/index.js";
-import { FileCache } from "../../src/cache/index.js";
-import { BetaListBackend } from "../../src/backends/index.js";
 import * as os from "node:os";
 import * as path from "node:path";
+import { describe, expect, it } from "vitest";
+import { AnonymousAuth } from "../../src/auth/index.js";
+import { BetaListBackend } from "../../src/backends/index.js";
+import { FileCache } from "../../src/cache/index.js";
 
 const LIVE_TESTS_ENABLED = process.env.BL_LIVE_TESTS === "1";
 

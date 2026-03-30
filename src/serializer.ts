@@ -22,10 +22,7 @@ export function toYAML<T>(output: CLIOutput<T>): string {
 /**
  * Serialize based on format
  */
-export function serialize<T>(
-	output: CLIOutput<T>,
-	format: "json" | "yaml",
-): string {
+export function serialize<T>(output: CLIOutput<T>, format: "json" | "yaml"): string {
 	if (format === "yaml") {
 		return toYAML(output);
 	}
