@@ -1,0 +1,30 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Startup Command Snapshot > should format startup detail consistently 1`] = `
+"
+Test Startup
+Build something amazing
+
+Description:
+This is a comprehensive description of the startup. It provides amazing features.
+
+Website: https://teststartup.com
+BetaList: https://betalist.com/startups/test-startup
+Maker: John Doe (@johndoe)
+Categories: SaaS, Productivity
+Topics: Developer Tools, Automation
+
+Related Startups:
+  • Related One
+  • Related Two"
+`;
+
+exports[`Startup Command Snapshot > should handle minimal detail 1`] = `
+"
+Minimal Startup
+
+Description:
+Just a simple description.
+
+BetaList: https://betalist.com/startups/minimal"
+`;

@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "test-startup-1",
+    "name": "Test Startup 1",
+    "url": "https://betalist.com/startups/test-startup-1",
+    "tagline": "The first test startup for unit testing",
+    "logoUrl": "https://example.com/logo1.png",
+    "date": "Mar 29, 2026",
+    "categories": ["SaaS", "Productivity"]
+  },
+  {
+    "slug": "test-startup-2",
+    "name": "Test Startup 2",
+    "url": "https://betalist.com/startups/test-startup-2",
+    "tagline": "Another test startup with boost",
+    "logoUrl": "https://example.com/logo2.png",
+    "date": "Mar 28, 2026",
+    "categories": ["AI"],
+    "isBoosted": true
+  },
+  {
+    "slug": "minimal-startup",
+    "name": "Minimal Startup",
+    "url": "https://betalist.com/startups/minimal-startup"
+  }
+]

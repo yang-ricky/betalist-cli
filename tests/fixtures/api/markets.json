@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1,
+    "name": "SaaS",
+    "slug": "saas",
+    "startups_count": 1234
+  },
+  {
+    "id": 2,
+    "name": "AI",
+    "slug": "ai",
+    "startups_count": 567
+  },
+  {
+    "id": 3,
+    "name": "Fintech",
+    "slug": "fintech",
+    "parent_slug": "finance",
+    "startups_count": 890
+  }
+]
