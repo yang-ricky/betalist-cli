@@ -1,13 +1,11 @@
 export const STARTUP_SELECTORS = {
 	// Legacy fixtures + current BetaList layouts
-	listItem:
-		".startupCard, .startup-row, div.relative.flex.gap-3.border.border-gray-200",
+	listItem: ".startupCard, .startup-row, div.relative.flex.gap-3.border.border-gray-200",
 	listItemRow: ".startup-row",
 	listItemCard: "div.relative.flex.gap-3.border.border-gray-200",
 	listName:
 		".startupCard__name, span.leading-snug.font-medium.text-gray-900, div.font-medium.text-gray-900",
-	listTagline:
-		".startupCard__tagline, span.text-base.text-gray-500, div.text-gray-600",
+	listTagline: ".startupCard__tagline, span.text-base.text-gray-500, div.text-gray-600",
 	listLogo: ".startupCard__logo img, img",
 	listLink: '.startupCard__link, a[href^="/startups/"]',
 	listDate: ".startupCard__date",

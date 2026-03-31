@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import type { AnyNode } from "domhandler";
 import { SITE_URL } from "../constants.js";
 import { ParseError } from "../errors.js";
 import type { Startup, StartupDetail } from "../models/index.js";
@@ -6,34 +7,33 @@ import { STARTUP_SELECTORS } from "../selectors.js";
 
 const STARTUP_PATH_RE = /^\/startups\/([^/?#]+)$/;
 const BROWSE_PATH_RE = /^\/browse\/([^/?#]+)(?:\/([^/?#]+))?$/;
-const MONTHS = new Map<string, number>(
-	[
-		["jan", 1],
-		["january", 1],
-		["feb", 2],
-		["february", 2],
-		["mar", 3],
-		["march", 3],
-		["apr", 4],
-		["april", 4],
-		["may", 5],
-		["jun", 6],
-		["june", 6],
-		["jul", 7],
-		["july", 7],
-		["aug", 8],
-		["august", 8],
-		["sep", 9],
-		["sept", 9],
-		["september", 9],
-		["oct", 10],
-		["october", 10],
-		["nov", 11],
-		["november", 11],
-		["dec", 12],
-		["december", 12],
-	] as const,
-);
+type CheerioCollection = cheerio.Cheerio<AnyNode>;
+const MONTHS = new Map<string, number>([
+	["jan", 1],
+	["january", 1],
+	["feb", 2],
+	["february", 2],
+	["mar", 3],
+	["march", 3],
+	["apr", 4],
+	["april", 4],
+	["may", 5],
+	["jun", 6],
+	["june", 6],
+	["jul", 7],
+	["july", 7],
+	["aug", 8],
+	["august", 8],
+	["sep", 9],
+	["sept", 9],
+	["september", 9],
+	["oct", 10],
+	["october", 10],
+	["nov", 11],
+	["november", 11],
+	["dec", 12],
+	["december", 12],
+] as const);
 
 /**
  * Parse startup list from homepage HTML
@@ -95,7 +95,7 @@ export function parseStartupDetail(html: string, slug: string): StartupDetail {
 		startup.maker = maker;
 	} else {
 		const makerLink = getSectionLinks($, "Makers").first();
-		const makerName = extractLinkLabel($, makerLink);
+		const makerName = extractLinkLabel(makerLink);
 		if (makerName) startup.maker = makerName;
 
 		const href = makerLink.attr("href");
@@ -116,7 +116,7 @@ export function parseStartupDetail(html: string, slug: string): StartupDetail {
 		const topicLinks = getSectionLinks($, "Topics");
 		const parsedTopics = topicLinks
 			.toArray()
-			.map((el) => extractLinkLabel($, $(el)))
+			.map((el) => extractLinkLabel($(el)))
 			.filter((topic): topic is string => Boolean(topic));
 
 		if (parsedTopics.length > 0) {
@@ -159,7 +159,7 @@ export function parseStartupDetail(html: string, slug: string): StartupDetail {
 
 function parseStartupListItem(
 	$: cheerio.CheerioAPI,
-	$context: cheerio.Cheerio<any>,
+	$context: CheerioCollection,
 	options: { includeDate: boolean },
 ): Startup | null {
 	const href = findStartupHref($, $context);
@@ -183,7 +183,7 @@ function parseStartupListItem(
 	if (logoUrl) startup.logoUrl = toAbsoluteUrl(logoUrl);
 
 	if (options.includeDate) {
-		const date = extractListDate($, $context);
+		const date = extractListDate($context);
 		if (date) startup.date = date;
 	}
 
@@ -208,10 +208,7 @@ function parseStartupListItem(
 	return startup;
 }
 
-function findStartupHref(
-	$: cheerio.CheerioAPI,
-	$context: cheerio.Cheerio<any>,
-): string | null {
+function findStartupHref($: cheerio.CheerioAPI, $context: CheerioCollection): string | null {
 	for (const el of $context.find(STARTUP_SELECTORS.listLink).toArray()) {
 		const href = $(el).attr("href") || "";
 		if (STARTUP_PATH_RE.test(href)) {
@@ -221,7 +218,7 @@ function findStartupHref(
 	return null;
 }
 
-function extractName($context: cheerio.Cheerio<any>): string {
+function extractName($context: CheerioCollection): string {
 	const $name = $context.find(STARTUP_SELECTORS.listName).first();
 	if ($name.length === 0) {
 		return "";
@@ -229,10 +226,7 @@ function extractName($context: cheerio.Cheerio<any>): string {
 	return textWithoutChildren($name) || normalizeText($name.text());
 }
 
-function extractListDate(
-	$: cheerio.CheerioAPI,
-	$context: cheerio.Cheerio<any>,
-): string | undefined {
+function extractListDate($context: CheerioCollection): string | undefined {
 	const inlineDate = normalizeText($context.find(STARTUP_SELECTORS.listDate).first().text());
 	if (inlineDate) {
 		return normalizeDate(inlineDate);
@@ -249,7 +243,7 @@ function extractListDate(
 	return undefined;
 }
 
-function extractTexts(collection: cheerio.Cheerio<any>): string[] {
+function extractTexts(collection: CheerioCollection): string[] {
 	const values = collection
 		.toArray()
 		.map((el) => normalizeText(collection.eq(collection.index(el)).text()))
@@ -257,7 +251,7 @@ function extractTexts(collection: cheerio.Cheerio<any>): string[] {
 	return dedupe(values);
 }
 
-function getSectionLinks($: cheerio.CheerioAPI, heading: string): cheerio.Cheerio<any> {
+function getSectionLinks($: cheerio.CheerioAPI, heading: string): CheerioCollection {
 	const section = $("h3")
 		.filter((_, el) => normalizeText($(el).text()) === heading)
 		.first()
@@ -270,10 +264,7 @@ function getSectionLinks($: cheerio.CheerioAPI, heading: string): cheerio.Cheeri
 	return section.find("a");
 }
 
-function extractLinkLabel(
-	$: cheerio.CheerioAPI,
-	$link: cheerio.Cheerio<any>,
-): string | null {
+function extractLinkLabel($link: CheerioCollection): string | null {
 	if ($link.length === 0) {
 		return null;
 	}
@@ -305,7 +296,7 @@ function normalizeText(value: string): string {
 	return value.replace(/\s+/g, " ").trim();
 }
 
-function textWithoutChildren($el: cheerio.Cheerio<any>): string {
+function textWithoutChildren($el: CheerioCollection): string {
 	const clone = $el.clone();
 	clone.children().remove();
 	return normalizeText(clone.text());
@@ -353,9 +344,7 @@ function normalizeDate(value: string): string {
 		return formatIsoDate(year, month, day);
 	}
 
-	const fullMatch = value.match(
-		/^([A-Za-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?(?:,\s*|\s+)(\d{4})$/,
-	);
+	const fullMatch = value.match(/^([A-Za-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?(?:,\s*|\s+)(\d{4})$/);
 	if (fullMatch) {
 		const month = parseMonth(fullMatch[1]);
 		const day = Number.parseInt(fullMatch[2], 10);

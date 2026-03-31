@@ -14,7 +14,9 @@ export function parseMarketList(html: string): Market[] {
 
 	$(MARKET_SELECTORS.listItem).each((_, el) => {
 		const $el = $(el);
-		const href = $el.is("a") ? $el.attr("href") || "" : $el.find(MARKET_SELECTORS.slug).attr("href") || "";
+		const href = $el.is("a")
+			? $el.attr("href") || ""
+			: $el.find(MARKET_SELECTORS.slug).attr("href") || "";
 		const slug = href.match(CATEGORY_PATH_RE)?.[1];
 
 		let name = "";
